@@ -1,0 +1,60 @@
+<DPIC_IMPORT_DECL>
+
+class <CLASSNAME> extends uvm_component;
+    `uvm_component_utils(<CLASSNAME>)
+    
+    packet_in tr_in;
+    packet_out tr_out;
+
+    uvm_get_port #(packet_in) in;
+    uvm_put_port #(packet_out) out;
+
+    chandle objhandle = null; // Need a chandle to the DPI-C component
+
+    function new(string name = "<CLASSNAME>", uvm_component parent);
+        super.new(name, parent);
+        in = new("in", this);
+        out = new("out", this);
+    endfunction
+    
+    virtual function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        tr_out = packet_out::type_id::create("tr_out", this);
+    endfunction: build_phase
+    
+
+    // initialize MATLAB DPI-C component and set the objhandle
+    virtual function void start_of_simulation_phase (uvm_phase phase);
+        super.start_of_simulation_phase (phase);
+        objhandle=<DPIC_INIT>;
+    endfunction:start_of_simulation_phase
+
+    // Up to you if you only want to reset the DPI-C component here or in the run phase
+    // based on the input data
+    // reset MATLAB DPI-C component
+    virtual task reset_phase(uvm_phase phase);
+        super.reset_phase(phase);
+        phase.raise_objection(this);
+        // TODO: replace with transaction signals!
+        objhandle=<DPIC_RESET>;
+        phase.drop_objection(this);
+    endtask: reset_phase 
+
+    // cleanup MATLAB DPI-C component
+    virtual function void final_phase(uvm_phase phase);
+        super.final_phase(phase);
+        <DPIC_TERMINATE>;
+    endfunction: final_phase
+
+    virtual task run_phase(uvm_phase phase);
+        super.run_phase(phase);
+        forever begin
+            in.get(tr_in);
+            // If manual crafted solution use next line
+            // MATLAB DPI-C function call
+            // TODO: replace with transaction signals!
+            <DPIC_FCN>;
+            out.put(tr_out);
+        end
+    endtask: run_phase
+endclass: <CLASSNAME>
