@@ -13,7 +13,7 @@ y_fixed = zeros(1,N,'like',fi(0,1,16,13));
 
 ref_frame = zeros(1,N,'double');
 for i = 1:N
-    [y_fixed(i),~,~,ref_frame] = genframe2Sample(N, Fs,F1,F2,mode,i_ready,rst);
+    [y_fixed(i),~,~,ref_frame] = genFrame2Sample(N, Fs,F1,F2,mode,i_ready,rst);
 end
 
 %plot(ref_frame,'bo-', 'LineWidth', 1);
